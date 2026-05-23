@@ -313,6 +313,12 @@ function connectSocket() {
   });
 
   socket.on('new-message', (msg) => {
+    // Si c'est notre propre message optimistic, on ignore (déjà affiché)
+    if (msg.userId === me.id && pendingMsgIds.size > 0) {
+      const firstPending = [...pendingMsgIds][0];
+      pendingMsgIds.delete(firstPending);
+      return;
+    }
     appendMessage(msg);
   });
 
@@ -373,6 +379,12 @@ async function loadRooms() {
   rooms = {};
   data.forEach(r => rooms[r.id] = r);
   renderRooms();
+
+  // Rouvrir le dernier salon automatiquement
+  const lastRoom = localStorage.getItem('sc_last_room');
+  if (lastRoom && rooms[lastRoom]) {
+    selectRoom(lastRoom);
+  }
 }
 
 function renderRooms() {
@@ -419,6 +431,12 @@ async function selectRoom(roomId) {
   typingUsers.clear();
   updateTypingIndicator();
 
+  // Rejoindre la room socket EN PREMIER pour ne rater aucun message
+  socket.emit('join-room', { roomId });
+
+  // Sauvegarder le salon actif
+  localStorage.setItem('sc_last_room', roomId);
+
   // Load messages
   let res;
   try { res = await apiFetch(`/api/rooms/${roomId}/messages`); } catch { return; }
@@ -426,8 +444,6 @@ async function selectRoom(roomId) {
     const msgs = await res.json();
     renderMessages(msgs);
   }
-
-  socket.emit('join-room', { roomId });
 
   // Sur mobile : afficher le chat
   showMobileView('chat');
@@ -614,6 +630,12 @@ function sendMessage() {
   const input = document.getElementById('message-input');
   const content = input.value.trim();
   if (!content || !currentRoomId || !socket?.connected) return;
+
+  const tempId = 'tmp_' + Date.now();
+  pendingMsgIds.add(tempId);
+
+  // Afficher immédiatement (optimistic)
+  appendMessage({ id: tempId, userId: me.id, username: me.username, content, type: 'text', timestamp: Date.now() });
 
   socket.emit('send-message', { roomId: currentRoomId, content, type: 'text' });
   socket.emit('stop-typing', { roomId: currentRoomId });
