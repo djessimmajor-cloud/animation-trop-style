@@ -438,11 +438,14 @@ async function selectRoom(roomId) {
   // Sauvegarder le salon actif
   localStorage.setItem('sc_last_room', roomId);
 
-  // Polling membres en ligne toutes les secondes
+  // Heartbeat + polling membres toutes les secondes
   if (onlinePollInterval) clearInterval(onlinePollInterval);
   onlinePollInterval = setInterval(async () => {
     if (!currentRoomId) return;
     try {
+      // Signaler qu'on est en ligne
+      await apiFetch(`/api/rooms/${currentRoomId}/heartbeat`, { method: 'POST' });
+      // Récupérer la liste des membres en ligne
       const r = await apiFetch(`/api/rooms/${currentRoomId}/online`);
       if (r.ok) renderOnlineMembers(await r.json());
     } catch {}

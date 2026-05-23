@@ -158,10 +158,18 @@ app.get('/api/rooms/:roomId/online', authMiddleware, async (req, res) => {
   const { data: member } = await supabase.from('room_members').select('user_id').eq('room_id', req.params.roomId).eq('user_id', req.user.id).maybeSingle();
   if (!member) return res.status(403).json({ error: 'Accès refusé' });
 
-  const users = Object.values(onlineUsers)
-    .filter(u => u.roomId === req.params.roomId)
-    .map(u => ({ userId: u.userId, username: u.username }));
-  res.json(users);
+  // Considéré en ligne si last_seen < 8 secondes
+  const cutoff = new Date(Date.now() - 8000).toISOString();
+  const { data } = await supabase.from('presence').select('user_id, username').eq('room_id', req.params.roomId).gte('last_seen', cutoff);
+  res.json((data || []).map(u => ({ userId: u.user_id, username: u.username })));
+});
+
+app.post('/api/rooms/:roomId/heartbeat', authMiddleware, async (req, res) => {
+  const { data: member } = await supabase.from('room_members').select('user_id').eq('room_id', req.params.roomId).eq('user_id', req.user.id).maybeSingle();
+  if (!member) return res.status(403).json({ error: 'Accès refusé' });
+
+  await supabase.from('presence').upsert({ user_id: req.user.id, username: req.user.username, room_id: req.params.roomId, last_seen: new Date().toISOString() }, { onConflict: 'user_id' });
+  res.json({ ok: true });
 });
 
 app.get('/api/ping', async (req, res) => {
