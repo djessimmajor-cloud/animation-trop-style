@@ -30,6 +30,7 @@ let currentRoomCode = null;
 let rooms = {};
 let typingTimeout = null;
 let typingUsers = new Set();
+let onlinePollInterval = null;
 const pendingMsgIds = new Set(); // messages envoyés localement, à ignorer quand le serveur les renvoie
 
 // WebRTC
@@ -436,6 +437,16 @@ async function selectRoom(roomId) {
 
   // Sauvegarder le salon actif
   localStorage.setItem('sc_last_room', roomId);
+
+  // Polling membres en ligne toutes les secondes
+  if (onlinePollInterval) clearInterval(onlinePollInterval);
+  onlinePollInterval = setInterval(async () => {
+    if (!currentRoomId) return;
+    try {
+      const r = await apiFetch(`/api/rooms/${currentRoomId}/online`);
+      if (r.ok) renderOnlineMembers(await r.json());
+    } catch {}
+  }, 1000);
 
   // Load messages
   let res;

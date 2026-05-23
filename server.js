@@ -154,6 +154,16 @@ app.post('/api/upload', authMiddleware, upload.single('file'), (req, res) => {
   });
 });
 
+app.get('/api/rooms/:roomId/online', authMiddleware, async (req, res) => {
+  const { data: member } = await supabase.from('room_members').select('user_id').eq('room_id', req.params.roomId).eq('user_id', req.user.id).maybeSingle();
+  if (!member) return res.status(403).json({ error: 'Accès refusé' });
+
+  const users = Object.values(onlineUsers)
+    .filter(u => u.roomId === req.params.roomId)
+    .map(u => ({ userId: u.userId, username: u.username }));
+  res.json(users);
+});
+
 app.get('/api/ping', async (req, res) => {
   const { count } = await supabase.from('users').select('*', { count: 'exact', head: true });
   res.json({ ok: true, users: count });
