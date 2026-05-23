@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureChat</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen" class="screen active">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="11" fill="#5865f2"/>
+        <path d="M8 12a4 4 0 008 0" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="9" cy="10" r="1.5" fill="#fff"/>
+        <circle cx="15" cy="10" r="1.5" fill="#fff"/>
+      </svg>
+      <h1>SecureChat</h1>
+    </div>
+    <div class="auth-tabs">
+      <button class="tab active" data-tab="login">Connexion</button>
+      <button class="tab" data-tab="register">Inscription</button>
+    </div>
+    <form id="auth-form">
+      <div class="form-group">
+        <label>Nom d'utilisateur</label>
+        <input type="text" id="auth-username" placeholder="Votre pseudo" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <div class="error-msg" id="auth-error"></div>
+      <button type="submit" class="btn-primary" id="auth-submit">Se connecter</button>
+    </form>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-screen" class="screen">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-top">
+      <div class="server-icon active" title="Mes salons">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="rooms-list" id="rooms-list"></div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar" id="my-avatar"></div>
+        <div class="user-details">
+          <span id="my-username" class="username"></span>
+          <span class="status">En ligne</span>
+        </div>
+        <button class="icon-btn" id="logout-btn" title="Déconnexion">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Channel list -->
+  <div class="channel-panel">
+    <div class="server-header">
+      <span id="server-name">Salons</span>
+      <button class="icon-btn" id="create-room-btn" title="Créer un salon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="channel-section">
+      <div class="section-title">
+        <span>SALONS TEXTUELS</span>
+        <button class="icon-btn small" id="join-room-btn" title="Rejoindre avec un code">+</button>
+      </div>
+      <div id="channel-list"></div>
+    </div>
+    <div class="members-panel">
+      <div class="section-title"><span>EN LIGNE</span></div>
+      <div id="members-list"></div>
+    </div>
+  </div>
+
+  <!-- Chat area -->
+  <div class="chat-area">
+    <div class="chat-header" id="chat-header">
+      <div class="chat-header-left">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+        </svg>
+        <span id="current-room-name">Sélectionne un salon</span>
+      </div>
+      <div class="chat-header-right">
+        <div class="room-code-display" id="room-code-display" style="display:none">
+          <span>Code : </span><strong id="room-code-text"></strong>
+          <button class="icon-btn small" id="copy-code-btn" title="Copier le code">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="messages-area" id="messages-area">
+      <div class="welcome-msg">
+        <div class="welcome-icon">💬</div>
+        <h2>Bienvenue sur SecureChat</h2>
+        <p>Crée ou rejoins un salon pour commencer à discuter.</p>
+      </div>
+    </div>
+
+    <div class="typing-indicator" id="typing-indicator"></div>
+
+    <div class="chat-input-area" id="chat-input-area" style="display:none">
+      <label class="file-btn" for="file-input" title="Envoyer un fichier">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+        </svg>
+      </label>
+      <input type="file" id="file-input" accept="image/*,video/*,audio/*,.pdf,.txt,.zip" style="display:none">
+      <div class="input-wrapper">
+        <textarea id="message-input" placeholder="Écrire un message..." rows="1"></textarea>
+      </div>
+      <button class="send-btn" id="send-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Members sidebar -->
+  <div class="members-sidebar" id="members-sidebar">
+    <div class="section-title"><span>MEMBRES EN LIGNE</span></div>
+    <div id="members-sidebar-list"></div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-overlay">
+  <!-- Create Room Modal -->
+  <div class="modal" id="create-room-modal">
+    <h2>Créer un salon</h2>
+    <div class="form-group">
+      <label>Nom du salon</label>
+      <input type="text" id="room-name-input" placeholder="ex: général">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="cancel-create-btn">Annuler</button>
+      <button class="btn-primary" id="confirm-create-btn">Créer</button>
+    </div>
+  </div>
+
+  <!-- Join Room Modal -->
+  <div class="modal" id="join-room-modal" style="display:none">
+    <h2>Rejoindre un salon</h2>
+    <p style="color:#b9bbbe;font-size:14px;margin-bottom:16px">Saisis le code du salon que tu veux rejoindre.</p>
+    <div class="form-group">
+      <label>Code d'invitation</label>
+      <input type="text" id="join-code-input" placeholder="ex: ABC123" style="text-transform:uppercase;letter-spacing:4px;font-size:18px;text-align:center">
+    </div>
+    <div class="error-msg" id="join-error"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="cancel-join-btn">Annuler</button>
+      <button class="btn-primary" id="confirm-join-btn">Rejoindre</button>
+    </div>
+  </div>
+</div>
+
+<!-- Call overlay -->
+<div class="call-overlay" id="call-overlay" style="display:none">
+  <div class="call-box">
+    <div class="call-avatar" id="call-avatar"></div>
+    <div class="call-name" id="call-name"></div>
+    <div class="call-status" id="call-status">Appel entrant...</div>
+    <div class="call-actions">
+      <button class="call-btn accept" id="accept-call-btn" title="Accepter">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+        </svg>
+      </button>
+      <button class="call-btn reject" id="reject-call-btn" title="Refuser">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Active call UI -->
+<div class="active-call" id="active-call" style="display:none">
+  <video id="remote-video" autoplay playsinline></video>
+  <video id="local-video" autoplay playsinline muted></video>
+  <div class="call-controls">
+    <span id="call-peer-name"></span>
+    <div class="call-btns">
+      <button class="ctrl-btn" id="mute-btn" title="Couper le micro">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2H3v2a9 9 0 008 8.94V23h2v-2.06A9 9 0 0021 12v-2h-2z"/>
+        </svg>
+      </button>
+      <button class="ctrl-btn" id="cam-btn" title="Caméra">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/>
+        </svg>
+      </button>
+      <button class="ctrl-btn end" id="end-call-btn" title="Raccrocher">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
