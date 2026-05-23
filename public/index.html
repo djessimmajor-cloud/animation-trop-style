@@ -95,6 +95,11 @@
   <div class="chat-area">
     <div class="chat-header" id="chat-header">
       <div class="chat-header-left">
+        <button class="mobile-back-btn" id="mobile-back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
         </svg>
@@ -168,7 +173,7 @@
     <p style="color:#b9bbbe;font-size:14px;margin-bottom:16px">Saisis le code du salon que tu veux rejoindre.</p>
     <div class="form-group">
       <label>Code d'invitation</label>
-      <input type="text" id="join-code-input" placeholder="ex: ABC123" style="text-transform:uppercase;letter-spacing:4px;font-size:18px;text-align:center">
+      <input type="text" id="join-code-input" placeholder="ex: 123456" inputmode="numeric" pattern="[0-9]*" maxlength="6" style="letter-spacing:6px;font-size:22px;text-align:center;font-family:monospace">
     </div>
     <div class="error-msg" id="join-error"></div>
     <div class="modal-actions">
@@ -224,6 +229,29 @@
     </div>
   </div>
 </div>
+
+<!-- Mobile bottom nav -->
+<nav class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav-btn active" id="nav-chat-btn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+    </svg>
+    Chat
+  </button>
+  <button class="mobile-nav-btn" id="nav-rooms-btn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+      <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+    </svg>
+    Salons
+  </button>
+  <button class="mobile-nav-btn" id="nav-join-btn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    Rejoindre
+  </button>
+</nav>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>

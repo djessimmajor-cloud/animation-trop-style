@@ -822,3 +822,122 @@ body {
   max-height: 90vh;
   border-radius: 4px;
 }
+
+/* ============================================================
+   MOBILE — bottom nav + vue plein écran
+   ============================================================ */
+
+/* Bouton hamburger visible seulement mobile */
+.mobile-back-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px 4px 0;
+  margin-right: 4px;
+}
+
+/* Bottom nav bar mobile */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: var(--bg-dark);
+  border-top: 1px solid var(--border);
+  z-index: 500;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.mobile-nav-btn {
+  flex: 1;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.mobile-nav-btn.active { color: var(--accent); }
+.mobile-nav-btn svg { flex-shrink: 0; }
+
+@media (max-width: 768px) {
+  /* Auth — plein écran */
+  .auth-box {
+    width: 100%;
+    min-height: 100vh;
+    border-radius: 0;
+    padding: 40px 24px;
+  }
+
+  /* App layout — empilé */
+  #app-screen {
+    flex-direction: column;
+    padding-bottom: 56px; /* place pour la nav */
+  }
+
+  /* Sidebar icônes — cachée */
+  .sidebar { display: none; }
+
+  /* Panel canaux — plein écran, caché par défaut */
+  .channel-panel {
+    position: fixed;
+    inset: 0;
+    bottom: 56px;
+    width: 100%;
+    z-index: 200;
+    display: none;
+  }
+  .channel-panel.mobile-visible { display: flex; }
+
+  /* Members sidebar — cachée */
+  .members-sidebar { display: none; }
+
+  /* Chat — prend tout */
+  .chat-area {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+  }
+
+  /* Header chat — bouton retour */
+  .mobile-back-btn { display: flex; align-items: center; }
+
+  /* Code salon — raccourci */
+  .room-code-display { padding: 3px 8px; }
+  .room-code-display > span:first-child { display: none; }
+
+  /* Messages */
+  .msg-image { max-width: 100%; }
+  .msg-video { max-width: 100%; }
+  .msg-audio { width: 100%; }
+  .msg-file { max-width: 100%; }
+
+  /* Input — colle en bas au-dessus de la nav */
+  .chat-input-area { padding: 8px 8px 8px; }
+
+  /* Modal plein écran */
+  .modal {
+    width: calc(100% - 32px);
+    margin: 16px;
+  }
+
+  /* Bottom nav */
+  .mobile-nav { display: flex; }
+
+  /* Local video plus petit */
+  #local-video { width: 100px; top: 8px; right: 8px; }
+
+  /* Toast au-dessus de la nav */
+  .toast { bottom: 72px; }
+}

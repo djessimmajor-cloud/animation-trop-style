@@ -4,6 +4,25 @@
 
 const API = '';
 let token = localStorage.getItem('sc_token');
+
+async function apiFetch(url, opts = {}) {
+  const res = await fetch(API + url, {
+    ...opts,
+    headers: {
+      ...(opts.headers || {}),
+      Authorization: `Bearer ${token}`
+    }
+  });
+  if (res.status === 401) {
+    localStorage.removeItem('sc_token');
+    localStorage.removeItem('sc_user');
+    token = null; me = null;
+    showAuth();
+    document.getElementById('auth-error').textContent = 'Session expirée — reconnecte-toi.';
+    throw new Error('401');
+  }
+  return res;
+}
 let me = JSON.parse(localStorage.getItem('sc_user') || 'null');
 let socket = null;
 let currentRoomId = null;
@@ -171,8 +190,23 @@ function bindEvents() {
   document.getElementById('confirm-join-btn').addEventListener('click', joinRoom);
 
   document.getElementById('join-code-input').addEventListener('input', function() {
-    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+    this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
   });
+
+  // Mobile nav
+  document.getElementById('nav-chat-btn')?.addEventListener('click', () => showMobileView('chat'));
+  document.getElementById('nav-rooms-btn')?.addEventListener('click', () => showMobileView('rooms'));
+  document.getElementById('nav-join-btn')?.addEventListener('click', () => {
+    document.getElementById('join-room-modal').style.display = '';
+    document.getElementById('create-room-modal').style.display = 'none';
+    document.getElementById('modal-overlay').classList.add('active');
+    document.getElementById('join-code-input').value = '';
+    document.getElementById('join-error').textContent = '';
+    document.getElementById('join-code-input').focus();
+  });
+
+  // Bouton retour mobile
+  document.getElementById('mobile-back-btn')?.addEventListener('click', () => showMobileView('rooms'));
 
   // Modal overlay click
   document.getElementById('modal-overlay').addEventListener('click', (e) => {
@@ -241,6 +275,22 @@ function closeModal() {
   document.getElementById('modal-overlay').classList.remove('active');
 }
 
+function showMobileView(view) {
+  const panel = document.getElementById('channel-panel') || document.querySelector('.channel-panel');
+  const navChat = document.getElementById('nav-chat-btn');
+  const navRooms = document.getElementById('nav-rooms-btn');
+
+  if (view === 'rooms') {
+    if (panel) panel.classList.add('mobile-visible');
+    navRooms?.classList.add('active');
+    navChat?.classList.remove('active');
+  } else {
+    if (panel) panel.classList.remove('mobile-visible');
+    navChat?.classList.add('active');
+    navRooms?.classList.remove('active');
+  }
+}
+
 // ============================================================
 // SOCKET
 // ============================================================
@@ -249,6 +299,16 @@ function connectSocket() {
 
   socket.on('connect_error', (err) => {
     console.error('Socket error:', err.message);
+    if (err.message === 'Auth failed') {
+      // Token expiré ou invalide — déconnecter proprement
+      localStorage.removeItem('sc_token');
+      localStorage.removeItem('sc_user');
+      token = null; me = null;
+      showAuth();
+      setTimeout(() => {
+        document.getElementById('auth-error').textContent = 'Session expirée — reconnecte-toi.';
+      }, 100);
+    }
   });
 
   socket.on('new-message', (msg) => {
@@ -307,9 +367,8 @@ function connectSocket() {
 // ROOMS
 // ============================================================
 async function loadRooms() {
-  const res = await fetch(`${API}/api/rooms`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  let res;
+  try { res = await apiFetch('/api/rooms'); } catch { return; }
   if (!res.ok) return;
   const data = await res.json();
   rooms = {};
@@ -362,26 +421,31 @@ async function selectRoom(roomId) {
   updateTypingIndicator();
 
   // Load messages
-  const res = await fetch(`${API}/api/rooms/${roomId}/messages`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  let res;
+  try { res = await apiFetch(`/api/rooms/${roomId}/messages`); } catch { return; }
   if (res.ok) {
     const msgs = await res.json();
     renderMessages(msgs);
   }
 
   socket.emit('join-room', { roomId });
+
+  // Sur mobile : afficher le chat
+  showMobileView('chat');
 }
 
 async function createRoom() {
   const name = document.getElementById('room-name-input').value.trim();
   if (!name) return;
 
-  const res = await fetch(`${API}/api/rooms`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ name })
-  });
+  let res;
+  try {
+    res = await apiFetch('/api/rooms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+  } catch { return; }
   const room = await res.json();
   if (!res.ok) return;
 
@@ -398,11 +462,14 @@ async function joinRoom() {
   const errorEl = document.getElementById('join-error');
   if (!code) return;
 
-  const res = await fetch(`${API}/api/rooms/join`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ code })
-  });
+  let res;
+  try {
+    res = await apiFetch('/api/rooms/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+  } catch { return; }
   const room = await res.json();
   if (!res.ok) { errorEl.textContent = room.error; return; }
 
@@ -574,11 +641,10 @@ async function uploadAndSend(file) {
   const formData = new FormData();
   formData.append('file', file);
 
-  const res = await fetch(`${API}/api/upload`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-    body: formData
-  });
+  let res;
+  try {
+    res = await apiFetch('/api/upload', { method: 'POST', body: formData });
+  } catch { return; }
 
   if (!res.ok) { toast('Erreur upload'); return; }
   const data = await res.json();
