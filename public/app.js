@@ -30,6 +30,7 @@ let currentRoomCode = null;
 let rooms = {};
 let typingTimeout = null;
 let typingUsers = new Set();
+const pendingMsgIds = new Set(); // messages envoyés localement, à ignorer quand le serveur les renvoie
 
 // WebRTC
 let peerConnection = null;
@@ -312,9 +313,7 @@ function connectSocket() {
   });
 
   socket.on('new-message', (msg) => {
-    if (msg.userId !== me.id || msg.type !== 'text') {
-      appendMessage(msg);
-    }
+    appendMessage(msg);
   });
 
   socket.on('user-joined', ({ username }) => {
@@ -513,7 +512,7 @@ function renderMessages(msgs) {
 }
 
 function appendMessage(msg) {
-  if (currentRoomId !== msg.roomId && msg.roomId) return;
+  // Les messages socket n'ont pas de roomId (on est déjà dans la bonne room)
   const area = document.getElementById('messages-area');
 
   // Clear welcome
@@ -614,18 +613,7 @@ function escHtml(str) {
 function sendMessage() {
   const input = document.getElementById('message-input');
   const content = input.value.trim();
-  if (!content || !currentRoomId) return;
-
-  const msg = {
-    id: 'tmp-' + Date.now(),
-    userId: me.id,
-    username: me.username,
-    content,
-    type: 'text',
-    timestamp: Date.now(),
-    roomId: currentRoomId
-  };
-  appendMessage(msg);
+  if (!content || !currentRoomId || !socket?.connected) return;
 
   socket.emit('send-message', { roomId: currentRoomId, content, type: 'text' });
   socket.emit('stop-typing', { roomId: currentRoomId });
@@ -635,9 +623,9 @@ function sendMessage() {
 }
 
 async function uploadAndSend(file) {
-  if (!currentRoomId) return;
+  if (!currentRoomId || !socket?.connected) return;
 
-  toast('Envoi en cours...');
+  toast('📎 Envoi en cours...');
   const formData = new FormData();
   formData.append('file', file);
 
@@ -653,20 +641,6 @@ async function uploadAndSend(file) {
   if (data.mimetype.startsWith('image/')) type = 'image';
   else if (data.mimetype.startsWith('video/')) type = 'video';
   else if (data.mimetype.startsWith('audio/')) type = 'audio';
-
-  const msg = {
-    id: 'tmp-' + Date.now(),
-    userId: me.id,
-    username: me.username,
-    content: '',
-    type,
-    fileUrl: data.url,
-    filename: data.filename,
-    mimetype: data.mimetype,
-    timestamp: Date.now(),
-    roomId: currentRoomId
-  };
-  appendMessage(msg);
 
   socket.emit('send-message', {
     roomId: currentRoomId,

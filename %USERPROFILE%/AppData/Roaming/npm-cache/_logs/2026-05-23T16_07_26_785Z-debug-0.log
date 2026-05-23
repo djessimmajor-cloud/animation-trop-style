@@ -1,0 +1,258 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.6.2
+2 info using node@v24.13.0
+3 silly config load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\Djess\Desktop\claude_code\secure-chat\.npmrc
+5 silly config load:file:C:\Users\Djess\.npmrc
+6 silly config load:file:C:\Users\Djess\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install @supabase/supabase-js
+8 verbose argv "install" "@supabase/supabase-js"
+9 verbose logfile logs-max:10 dir:C:\Users\Djess\Desktop\claude_code\secure-chat\%USERPROFILE%\AppData\Roaming\npm-cache\_logs\2026-05-23T16_07_26_785Z-
+10 verbose logfile C:\Users\Djess\Desktop\claude_code\secure-chat\%USERPROFILE%\AppData\Roaming\npm-cache\_logs\2026-05-23T16_07_26_785Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:2348810240 maxSize:587202560 maxEntrySize:293601280
+13 silly idealTree buildDeps
+14 silly fetch manifest @supabase/supabase-js@*
+15 silly packumentCache full:https://registry.npmjs.org/@supabase%2fsupabase-js cache-miss
+16 http fetch GET 200 https://registry.npmjs.org/@supabase%2fsupabase-js 308ms (cache miss)
+17 silly packumentCache full:https://registry.npmjs.org/@supabase%2fsupabase-js set size:undefined disposed:false
+18 silly placeDep ROOT @supabase/supabase-js@2.106.1 OK for: secure-chat@1.0.0 want: *
+19 silly fetch manifest @supabase/auth-js@2.106.1
+20 silly packumentCache full:https://registry.npmjs.org/@supabase%2fauth-js cache-miss
+21 silly fetch manifest @supabase/storage-js@2.106.1
+22 silly packumentCache full:https://registry.npmjs.org/@supabase%2fstorage-js cache-miss
+23 silly fetch manifest @supabase/realtime-js@2.106.1
+24 silly packumentCache full:https://registry.npmjs.org/@supabase%2frealtime-js cache-miss
+25 silly fetch manifest @supabase/functions-js@2.106.1
+26 silly packumentCache full:https://registry.npmjs.org/@supabase%2ffunctions-js cache-miss
+27 silly fetch manifest @supabase/postgrest-js@2.106.1
+28 silly packumentCache full:https://registry.npmjs.org/@supabase%2fpostgrest-js cache-miss
+29 http fetch GET 200 https://registry.npmjs.org/@supabase%2fauth-js 100ms (cache miss)
+30 silly packumentCache full:https://registry.npmjs.org/@supabase%2fauth-js set size:undefined disposed:false
+31 http fetch GET 200 https://registry.npmjs.org/@supabase%2ffunctions-js 195ms (cache miss)
+32 silly packumentCache full:https://registry.npmjs.org/@supabase%2ffunctions-js set size:undefined disposed:false
+33 http fetch GET 200 https://registry.npmjs.org/@supabase%2fstorage-js 225ms (cache miss)
+34 silly packumentCache full:https://registry.npmjs.org/@supabase%2fstorage-js set size:undefined disposed:false
+35 http fetch GET 200 https://registry.npmjs.org/@supabase%2frealtime-js 248ms (cache miss)
+36 silly packumentCache full:https://registry.npmjs.org/@supabase%2frealtime-js set size:undefined disposed:false
+37 http fetch GET 200 https://registry.npmjs.org/@supabase%2fpostgrest-js 268ms (cache miss)
+38 silly packumentCache full:https://registry.npmjs.org/@supabase%2fpostgrest-js set size:undefined disposed:false
+39 silly placeDep ROOT @supabase/auth-js@2.106.1 OK for: @supabase/supabase-js@2.106.1 want: 2.106.1
+40 silly placeDep ROOT @supabase/functions-js@2.106.1 OK for: @supabase/supabase-js@2.106.1 want: 2.106.1
+41 silly placeDep ROOT @supabase/postgrest-js@2.106.1 OK for: @supabase/supabase-js@2.106.1 want: 2.106.1
+42 silly placeDep ROOT @supabase/realtime-js@2.106.1 OK for: @supabase/supabase-js@2.106.1 want: 2.106.1
+43 silly placeDep ROOT @supabase/storage-js@2.106.1 OK for: @supabase/supabase-js@2.106.1 want: 2.106.1
+44 silly fetch manifest tslib@2.8.1
+45 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+46 silly fetch manifest tslib@2.8.1
+47 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+48 silly fetch manifest tslib@2.8.1
+49 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+50 silly fetch manifest tslib@2.8.1
+51 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+52 silly fetch manifest @supabase/phoenix@^0.4.2
+53 silly packumentCache full:https://registry.npmjs.org/@supabase%2fphoenix cache-miss
+54 silly fetch manifest tslib@2.8.1
+55 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+56 silly fetch manifest iceberg-js@^0.8.1
+57 silly packumentCache full:https://registry.npmjs.org/iceberg-js cache-miss
+58 http fetch GET 200 https://registry.npmjs.org/tslib 68ms (cache miss)
+59 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+60 http fetch GET 200 https://registry.npmjs.org/tslib 85ms (cache miss)
+61 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+62 http fetch GET 200 https://registry.npmjs.org/tslib 86ms (cache miss)
+63 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+64 http fetch GET 200 https://registry.npmjs.org/tslib 91ms (cache miss)
+65 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+66 http fetch GET 200 https://registry.npmjs.org/@supabase%2fphoenix 90ms (cache miss)
+67 silly packumentCache full:https://registry.npmjs.org/@supabase%2fphoenix set size:undefined disposed:false
+68 http fetch GET 200 https://registry.npmjs.org/iceberg-js 102ms (cache miss)
+69 silly packumentCache full:https://registry.npmjs.org/iceberg-js set size:undefined disposed:false
+70 http fetch GET 200 https://registry.npmjs.org/tslib 104ms (cache miss)
+71 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+72 silly placeDep ROOT tslib@2.8.1 OK for: @supabase/auth-js@2.106.1 want: 2.8.1
+73 silly placeDep ROOT @supabase/phoenix@0.4.2 OK for: @supabase/realtime-js@2.106.1 want: ^0.4.2
+74 silly placeDep ROOT iceberg-js@0.8.1 OK for: @supabase/storage-js@2.106.1 want: ^0.8.1
+75 silly reify moves {}
+76 silly audit bulk request {
+76 silly audit   '@socket.io/component-emitter': [ '3.1.2' ],
+76 silly audit   '@types/cors': [ '2.8.19' ],
+76 silly audit   '@types/node': [ '25.9.1' ],
+76 silly audit   '@types/ws': [ '8.18.1' ],
+76 silly audit   accepts: [ '1.3.8' ],
+76 silly audit   'append-field': [ '1.0.0' ],
+76 silly audit   'array-flatten': [ '1.1.1' ],
+76 silly audit   base64id: [ '2.0.0' ],
+76 silly audit   bcryptjs: [ '2.4.3' ],
+76 silly audit   'body-parser': [ '1.20.5' ],
+76 silly audit   'buffer-equal-constant-time': [ '1.0.1' ],
+76 silly audit   'buffer-from': [ '1.1.2' ],
+76 silly audit   busboy: [ '1.6.0' ],
+76 silly audit   bytes: [ '3.1.2' ],
+76 silly audit   'call-bind-apply-helpers': [ '1.0.2' ],
+76 silly audit   'call-bound': [ '1.0.4' ],
+76 silly audit   'concat-stream': [ '1.6.2' ],
+76 silly audit   'content-disposition': [ '0.5.4' ],
+76 silly audit   'content-type': [ '1.0.5' ],
+76 silly audit   cookie: [ '0.7.2' ],
+76 silly audit   'cookie-signature': [ '1.0.7' ],
+76 silly audit   'core-util-is': [ '1.0.3' ],
+76 silly audit   cors: [ '2.8.6' ],
+76 silly audit   debug: [ '2.6.9', '4.4.3' ],
+76 silly audit   depd: [ '2.0.0' ],
+76 silly audit   destroy: [ '1.2.0' ],
+76 silly audit   'dunder-proto': [ '1.0.1' ],
+76 silly audit   'ecdsa-sig-formatter': [ '1.0.11' ],
+76 silly audit   'ee-first': [ '1.1.1' ],
+76 silly audit   encodeurl: [ '2.0.0' ],
+76 silly audit   'engine.io': [ '6.6.8' ],
+76 silly audit   'engine.io-parser': [ '5.2.3' ],
+76 silly audit   ms: [ '2.1.3', '2.0.0' ],
+76 silly audit   'es-define-property': [ '1.0.1' ],
+76 silly audit   'es-errors': [ '1.3.0' ],
+76 silly audit   'es-object-atoms': [ '1.1.2' ],
+76 silly audit   'escape-html': [ '1.0.3' ],
+76 silly audit   etag: [ '1.8.1' ],
+76 silly audit   express: [ '4.22.2' ],
+76 silly audit   finalhandler: [ '1.3.2' ],
+76 silly audit   forwarded: [ '0.2.0' ],
+76 silly audit   fresh: [ '0.5.2' ],
+76 silly audit   'function-bind': [ '1.1.2' ],
+76 silly audit   'get-intrinsic': [ '1.3.0' ],
+76 silly audit   'get-proto': [ '1.0.1' ],
+76 silly audit   gopd: [ '1.2.0' ],
+76 silly audit   'has-symbols': [ '1.1.0' ],
+76 silly audit   hasown: [ '2.0.3' ],
+76 silly audit   'http-errors': [ '2.0.1' ],
+76 silly audit   'iconv-lite': [ '0.4.24' ],
+76 silly audit   inherits: [ '2.0.4' ],
+76 silly audit   'ipaddr.js': [ '1.9.1' ],
+76 silly audit   isarray: [ '1.0.0' ],
+76 silly audit   jsonwebtoken: [ '9.0.3' ],
+76 silly audit   jwa: [ '2.0.1' ],
+76 silly audit   jws: [ '4.0.1' ],
+76 silly audit   'lodash.includes': [ '4.3.0' ],
+76 silly audit   'lodash.isboolean': [ '3.0.3' ],
+76 silly audit   'lodash.isinteger': [ '4.0.4' ],
+76 silly audit   'lodash.isnumber': [ '3.0.3' ],
+76 silly audit   'lodash.isplainobject': [ '4.0.6' ],
+76 silly audit   'lodash.isstring': [ '4.0.1' ],
+76 silly audit   'lodash.once': [ '4.1.1' ],
+76 silly audit   'math-intrinsics': [ '1.1.0' ],
+76 silly audit   'media-typer': [ '0.3.0' ],
+76 silly audit   'merge-descriptors': [ '1.0.3' ],
+76 silly audit   methods: [ '1.1.2' ],
+76 silly audit   mime: [ '1.6.0' ],
+76 silly audit   'mime-db': [ '1.52.0' ],
+76 silly audit   'mime-types': [ '2.1.35' ],
+76 silly audit   minimist: [ '1.2.8' ],
+76 silly audit   mkdirp: [ '0.5.6' ],
+76 silly audit   multer: [ '1.4.5-lts.2' ],
+76 silly audit   negotiator: [ '0.6.3' ],
+76 silly audit   'object-assign': [ '4.1.1' ],
+76 silly audit   'object-inspect': [ '1.13.4' ],
+76 silly audit   'on-finished': [ '2.4.1' ],
+76 silly audit   parseurl: [ '1.3.3' ],
+76 silly audit   'path-to-regexp': [ '0.1.13' ],
+76 silly audit   'process-nextick-args': [ '2.0.1' ],
+76 silly audit   'proxy-addr': [ '2.0.7' ],
+76 silly audit   qs: [ '6.15.2' ],
+76 silly audit   'range-parser': [ '1.2.1' ],
+76 silly audit   'raw-body': [ '2.5.3' ],
+76 silly audit   'readable-stream': [ '2.3.8' ],
+76 silly audit   'safe-buffer': [ '5.1.2', '5.2.1' ],
+76 silly audit   'safer-buffer': [ '2.1.2' ],
+76 silly audit   semver: [ '7.8.1' ],
+76 silly audit   send: [ '0.19.2' ],
+76 silly audit   'serve-static': [ '1.16.3' ],
+76 silly audit   setprototypeof: [ '1.2.0' ],
+76 silly audit   'side-channel': [ '1.1.0' ],
+76 silly audit   'side-channel-list': [ '1.0.1' ],
+76 silly audit   'side-channel-map': [ '1.0.1' ],
+76 silly audit   'side-channel-weakmap': [ '1.0.2' ],
+76 silly audit   'socket.io': [ '4.8.3' ],
+76 silly audit   'socket.io-adapter': [ '2.5.7' ],
+76 silly audit   'socket.io-parser': [ '4.2.6' ],
+76 silly audit   statuses: [ '2.0.2' ],
+76 silly audit   streamsearch: [ '1.1.0' ],
+76 silly audit   string_decoder: [ '1.1.1' ],
+76 silly audit   toidentifier: [ '1.0.1' ],
+76 silly audit   'type-is': [ '1.6.18' ],
+76 silly audit   typedarray: [ '0.0.6' ],
+76 silly audit   'undici-types': [ '7.24.6' ],
+76 silly audit   unpipe: [ '1.0.0' ],
+76 silly audit   'util-deprecate': [ '1.0.2' ],
+76 silly audit   'utils-merge': [ '1.0.1' ],
+76 silly audit   uuid: [ '9.0.1' ],
+76 silly audit   vary: [ '1.1.2' ],
+76 silly audit   ws: [ '8.20.1' ],
+76 silly audit   xtend: [ '4.0.2' ],
+76 silly audit   '@supabase/supabase-js': [ '2.106.1' ],
+76 silly audit   '@supabase/auth-js': [ '2.106.1' ],
+76 silly audit   '@supabase/functions-js': [ '2.106.1' ],
+76 silly audit   '@supabase/postgrest-js': [ '2.106.1' ],
+76 silly audit   '@supabase/realtime-js': [ '2.106.1' ],
+76 silly audit   '@supabase/storage-js': [ '2.106.1' ],
+76 silly audit   tslib: [ '2.8.1' ],
+76 silly audit   '@supabase/phoenix': [ '0.4.2' ],
+76 silly audit   'iceberg-js': [ '0.8.1' ]
+76 silly audit }
+77 http cache @supabase/phoenix@https://registry.npmjs.org/@supabase/phoenix/-/phoenix-0.4.2.tgz 1ms (cache hit)
+78 http cache @supabase/storage-js@https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.106.1.tgz 0ms (cache hit)
+79 http cache tslib@https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz 0ms (cache hit)
+80 http cache @supabase/realtime-js@https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.106.1.tgz 1ms (cache hit)
+81 http cache iceberg-js@https://registry.npmjs.org/iceberg-js/-/iceberg-js-0.8.1.tgz 1ms (cache hit)
+82 http cache @supabase/auth-js@https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.106.1.tgz 0ms (cache hit)
+83 http cache @supabase/postgrest-js@https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.106.1.tgz 0ms (cache hit)
+84 http cache @supabase/functions-js@https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.106.1.tgz 0ms (cache hit)
+85 silly tarball no local data for @supabase/phoenix@https://registry.npmjs.org/@supabase/phoenix/-/phoenix-0.4.2.tgz. Extracting by manifest.
+86 silly tarball no local data for @supabase/storage-js@https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.106.1.tgz. Extracting by manifest.
+87 silly tarball no local data for tslib@https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz. Extracting by manifest.
+88 silly tarball no local data for @supabase/realtime-js@https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.106.1.tgz. Extracting by manifest.
+89 silly tarball no local data for iceberg-js@https://registry.npmjs.org/iceberg-js/-/iceberg-js-0.8.1.tgz. Extracting by manifest.
+90 silly tarball no local data for @supabase/auth-js@https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.106.1.tgz. Extracting by manifest.
+91 silly tarball no local data for @supabase/postgrest-js@https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.106.1.tgz. Extracting by manifest.
+92 silly tarball no local data for @supabase/functions-js@https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.106.1.tgz. Extracting by manifest.
+93 http cache @supabase/supabase-js@https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.106.1.tgz 0ms (cache hit)
+94 silly tarball no local data for @supabase/supabase-js@https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.106.1.tgz. Extracting by manifest.
+95 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 190ms
+96 silly audit report {
+96 silly audit report   uuid: [
+96 silly audit report     {
+96 silly audit report       id: 1119441,
+96 silly audit report       url: 'https://github.com/advisories/GHSA-w5hq-g745-h8pq',
+96 silly audit report       title: 'uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided',
+96 silly audit report       severity: 'moderate',
+96 silly audit report       vulnerable_versions: '<11.1.1',
+96 silly audit report       cwe: [Array],
+96 silly audit report       cvss: [Object]
+96 silly audit report     }
+96 silly audit report   ]
+96 silly audit report }
+97 silly packumentCache corgi:https://registry.npmjs.org/uuid cache-miss
+98 http fetch GET 200 https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz 188ms (cache miss)
+99 http fetch GET 200 https://registry.npmjs.org/iceberg-js/-/iceberg-js-0.8.1.tgz 213ms (cache miss)
+100 http fetch GET 200 https://registry.npmjs.org/uuid 71ms (cache revalidated)
+101 silly packumentCache corgi:https://registry.npmjs.org/uuid set size:81812 disposed:false
+102 http fetch GET 200 https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.106.1.tgz 429ms (cache miss)
+103 http fetch GET 200 https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.106.1.tgz 420ms (cache miss)
+104 http fetch GET 200 https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.106.1.tgz 465ms (cache miss)
+105 http fetch GET 200 https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.106.1.tgz 583ms (cache miss)
+106 http fetch GET 200 https://registry.npmjs.org/@supabase/phoenix/-/phoenix-0.4.2.tgz 606ms (cache miss)
+107 http fetch GET 200 https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.106.1.tgz 900ms (cache miss)
+108 http fetch GET 200 https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.106.1.tgz 1361ms (cache miss)
+109 silly ADD node_modules/iceberg-js
+110 silly ADD node_modules/@supabase/phoenix
+111 silly ADD node_modules/tslib
+112 silly ADD node_modules/@supabase/storage-js
+113 silly ADD node_modules/@supabase/realtime-js
+114 silly ADD node_modules/@supabase/postgrest-js
+115 silly ADD node_modules/@supabase/functions-js
+116 silly ADD node_modules/@supabase/auth-js
+117 silly ADD node_modules/@supabase/supabase-js
+118 verbose cwd C:\Users\Djess\Desktop\claude_code\secure-chat
+119 verbose os Windows_NT 10.0.26200
+120 verbose node v24.13.0
+121 verbose npm  v11.6.2
+122 verbose exit 0
+123 info ok

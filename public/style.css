@@ -21,10 +21,11 @@ body {
   background: var(--bg-dark);
   color: var(--text);
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
-.screen { display: none; height: 100vh; }
+.screen { display: none; height: 100vh; height: 100dvh; }
 .screen.active { display: flex; }
 
 /* --- AUTH --- */
@@ -878,12 +879,16 @@ body {
     min-height: 100vh;
     border-radius: 0;
     padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
-  /* App layout — empilé */
+  /* App layout — colonne, hauteur dynamique pour clavier */
   #app-screen {
     flex-direction: column;
-    padding-bottom: 56px; /* place pour la nav */
+    height: 100%;
+    height: 100dvh; /* dynamic viewport height — s'adapte au clavier */
   }
 
   /* Sidebar icônes — cachée */
@@ -892,7 +897,9 @@ body {
   /* Panel canaux — plein écran, caché par défaut */
   .channel-panel {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     bottom: 56px;
     width: 100%;
     z-index: 200;
@@ -903,11 +910,14 @@ body {
   /* Members sidebar — cachée */
   .members-sidebar { display: none; }
 
-  /* Chat — prend tout */
+  /* Chat — flex column, remplit tout */
   .chat-area {
     flex: 1;
     width: 100%;
+    display: flex;
+    flex-direction: column;
     min-height: 0;
+    padding-bottom: 56px; /* place pour la nav */
   }
 
   /* Header chat — bouton retour */
@@ -917,14 +927,41 @@ body {
   .room-code-display { padding: 3px 8px; }
   .room-code-display > span:first-child { display: none; }
 
-  /* Messages */
+  /* Messages — scroll dans l'espace disponible */
+  .messages-area {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Messages médias */
   .msg-image { max-width: 100%; }
   .msg-video { max-width: 100%; }
   .msg-audio { width: 100%; }
   .msg-file { max-width: 100%; }
 
-  /* Input — colle en bas au-dessus de la nav */
-  .chat-input-area { padding: 8px 8px 8px; }
+  /* Input — fixé en bas, au-dessus de la nav */
+  .chat-input-area {
+    padding: 8px;
+    background: var(--bg-light);
+    border-top: 1px solid var(--border);
+    /* pas de position fixed — laisse le clavier pousser la zone */
+    flex-shrink: 0;
+  }
+
+  /* Textarea plus grand sur mobile */
+  #message-input {
+    font-size: 16px; /* évite le zoom auto sur iOS */
+    min-height: 24px;
+  }
+
+  /* Bouton envoi plus grand */
+  .send-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+  }
 
   /* Modal plein écran */
   .modal {

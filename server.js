@@ -7,6 +7,7 @@ const multer = require('multer');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const server = http.createServer(app);
@@ -15,69 +16,28 @@ const io = new Server(server, {
   maxHttpBufferSize: 50 * 1024 * 1024
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secure-chat-fallback-secret-change-me';
+const JWT_SECRET = process.env.JWT_SECRET || 'securechat-dev-secret-change-in-prod';
 const PORT = process.env.PORT || 3000;
 
-// --- Persistance fichier JSON dans /tmp (fonctionne sur Vercel/Railway/Render) ---
-const DATA_FILE = process.env.DATA_FILE || path.join(require('os').tmpdir(), 'securechat_data.json');
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://akbaqaotgnelfidhwktv.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrYmFxYW90Z25lbGZpZGh3a3R2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNjAzNTAsImV4cCI6MjA5MzYzNjM1MH0.taQiSLTeDToot4EdUdqopOEp5fkhRjd03EOKZYMGeWI';
 
-function loadData() {
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      const raw = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-      // Re-créer les Sets
-      if (raw.rooms) {
-        Object.values(raw.rooms).forEach(r => {
-          r.members = new Set(r.members || []);
-        });
-      }
-      return raw;
-    }
-  } catch (e) {
-    console.error('Erreur lecture data:', e.message);
-  }
-  return { users: {}, rooms: {}, messages: {} };
-}
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function saveData() {
-  try {
-    const toSave = {
-      users: db.users,
-      rooms: {},
-      messages: db.messages
-    };
-    // Convertir les Sets en arrays pour JSON
-    Object.entries(db.rooms).forEach(([id, r]) => {
-      toSave.rooms[id] = { ...r, members: [...r.members] };
-    });
-    fs.writeFileSync(DATA_FILE, JSON.stringify(toSave));
-  } catch (e) {
-    console.error('Erreur sauvegarde data:', e.message);
-  }
-}
-
-const db = loadData();
-
-// RAM uniquement (reset ok à chaque démarrage)
+// RAM uniquement — reset OK, c'est juste les sockets en ligne
 const onlineUsers = {}; // socketId -> { userId, username, roomId }
 const userSockets = {}; // userId -> socketId
 
-// --- Multer config (mémoire pour Vercel, /tmp pour autres) ---
+// --- Multer ---
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = path.join(__dirname, 'public/uploads');
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, uuidv4() + ext);
-  }
+  filename: (req, file, cb) => cb(null, uuidv4() + path.extname(file.originalname))
 });
-const upload = multer({
-  storage,
-  limits: { fileSize: 50 * 1024 * 1024 },
-});
+const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -90,7 +50,7 @@ function authMiddleware(req, res, next) {
     req.user = jwt.verify(token, JWT_SECRET);
     next();
   } catch {
-    res.status(401).json({ error: 'Token invalide — reconnecte-toi' });
+    res.status(401).json({ error: 'Session expirée — reconnecte-toi' });
   }
 }
 
@@ -98,84 +58,90 @@ function authMiddleware(req, res, next) {
 
 app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'Champs requis' });
-  if (username.length < 3) return res.status(400).json({ error: 'Pseudo trop court (min 3 caractères)' });
-  if (password.length < 6) return res.status(400).json({ error: 'Mot de passe trop court (min 6 caractères)' });
+  if (!username?.trim() || !password) return res.status(400).json({ error: 'Champs requis' });
+  if (username.trim().length < 3) return res.status(400).json({ error: 'Pseudo trop court (min 3)' });
+  if (password.length < 6) return res.status(400).json({ error: 'Mot de passe trop court (min 6)' });
 
-  const existing = Object.values(db.users).find(u => u.username.toLowerCase() === username.toLowerCase());
+  const { data: existing } = await supabase.from('users').select('id').ilike('username', username.trim()).maybeSingle();
   if (existing) return res.status(400).json({ error: 'Ce pseudo est déjà pris' });
 
-  const id = uuidv4();
   const passwordHash = await bcrypt.hash(password, 10);
-  db.users[id] = { id, username, passwordHash, createdAt: Date.now() };
-  saveData();
+  const { data: user, error } = await supabase.from('users').insert({ username: username.trim(), password_hash: passwordHash }).select('id, username').single();
+  if (error) return res.status(500).json({ error: 'Erreur serveur' });
 
-  const token = jwt.sign({ id, username }, JWT_SECRET, { expiresIn: '30d' });
-  res.json({ token, user: { id, username } });
+  const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '30d' });
+  res.json({ token, user: { id: user.id, username: user.username } });
 });
 
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Champs requis' });
 
-  const user = Object.values(db.users).find(u => u.username.toLowerCase() === username.toLowerCase());
+  const { data: user } = await supabase.from('users').select('id, username, password_hash').ilike('username', username).maybeSingle();
   if (!user) return res.status(401).json({ error: 'Identifiants incorrects' });
 
-  const valid = await bcrypt.compare(password, user.passwordHash);
+  const valid = await bcrypt.compare(password, user.password_hash);
   if (!valid) return res.status(401).json({ error: 'Identifiants incorrects' });
 
   const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '30d' });
   res.json({ token, user: { id: user.id, username: user.username } });
 });
 
-app.post('/api/rooms', authMiddleware, (req, res) => {
+app.post('/api/rooms', authMiddleware, async (req, res) => {
   const { name } = req.body;
-  if (!name || !name.trim()) return res.status(400).json({ error: 'Nom du salon requis' });
+  if (!name?.trim()) return res.status(400).json({ error: 'Nom du salon requis' });
 
-  const id = uuidv4();
-  // Code 6 chiffres seulement pour éviter ambiguïté lettres
   const code = String(Math.floor(100000 + Math.random() * 900000));
-  db.rooms[id] = {
-    id,
-    name: name.trim(),
-    code,
-    ownerId: req.user.id,
-    members: new Set([req.user.id]),
-    createdAt: Date.now()
-  };
-  db.messages[id] = [];
-  saveData();
+  const { data: room, error } = await supabase.from('rooms').insert({ name: name.trim(), code, owner_id: req.user.id }).select('id, name, code, owner_id').single();
+  if (error) return res.status(500).json({ error: 'Erreur création salon' });
 
-  res.json({ id, name: name.trim(), code, ownerId: req.user.id });
+  await supabase.from('room_members').insert({ room_id: room.id, user_id: req.user.id });
+  res.json({ id: room.id, name: room.name, code: room.code, ownerId: room.owner_id });
 });
 
-app.post('/api/rooms/join', authMiddleware, (req, res) => {
-  const { code } = req.body;
+app.post('/api/rooms/join', authMiddleware, async (req, res) => {
+  const code = String(req.body.code || '').trim();
   if (!code) return res.status(400).json({ error: 'Code requis' });
 
-  const clean = String(code).trim();
-  const room = Object.values(db.rooms).find(r => r.code === clean);
-  if (!room) return res.status(404).json({ error: `Code "${clean}" invalide — vérifie le code` });
+  const { data: room } = await supabase.from('rooms').select('id, name, code, owner_id').eq('code', code).maybeSingle();
+  if (!room) return res.status(404).json({ error: `Code "${code}" invalide` });
 
-  room.members.add(req.user.id);
-  if (!db.messages[room.id]) db.messages[room.id] = [];
-  saveData();
-
-  res.json({ id: room.id, name: room.name, code: room.code, ownerId: room.ownerId });
+  await supabase.from('room_members').upsert({ room_id: room.id, user_id: req.user.id }, { onConflict: 'room_id,user_id' });
+  res.json({ id: room.id, name: room.name, code: room.code, ownerId: room.owner_id });
 });
 
-app.get('/api/rooms', authMiddleware, (req, res) => {
-  const myRooms = Object.values(db.rooms)
-    .filter(r => r.members.has(req.user.id))
-    .map(r => ({ id: r.id, name: r.name, code: r.code, ownerId: r.ownerId }));
-  res.json(myRooms);
+app.get('/api/rooms', authMiddleware, async (req, res) => {
+  const { data } = await supabase
+    .from('room_members')
+    .select('rooms(id, name, code, owner_id)')
+    .eq('user_id', req.user.id);
+
+  const rooms = (data || []).map(r => ({
+    id: r.rooms.id,
+    name: r.rooms.name,
+    code: r.rooms.code,
+    ownerId: r.rooms.owner_id
+  }));
+  res.json(rooms);
 });
 
-app.get('/api/rooms/:roomId/messages', authMiddleware, (req, res) => {
-  const room = db.rooms[req.params.roomId];
-  if (!room) return res.status(404).json({ error: 'Salon introuvable' });
-  if (!room.members.has(req.user.id)) return res.status(403).json({ error: 'Accès refusé' });
-  res.json(db.messages[req.params.roomId] || []);
+app.get('/api/rooms/:roomId/messages', authMiddleware, async (req, res) => {
+  // Vérifier membre
+  const { data: member } = await supabase.from('room_members').select('user_id').eq('room_id', req.params.roomId).eq('user_id', req.user.id).maybeSingle();
+  if (!member) return res.status(403).json({ error: 'Accès refusé' });
+
+  const { data: msgs } = await supabase.from('messages').select('*').eq('room_id', req.params.roomId).order('created_at', { ascending: true }).limit(200);
+  res.json((msgs || []).map(m => ({
+    id: m.id,
+    userId: m.user_id,
+    username: m.username,
+    content: m.content,
+    type: m.type,
+    fileUrl: m.file_url,
+    filename: m.filename,
+    mimetype: m.mimetype,
+    timestamp: new Date(m.created_at).getTime()
+  })));
 });
 
 app.post('/api/upload', authMiddleware, upload.single('file'), (req, res) => {
@@ -188,8 +154,10 @@ app.post('/api/upload', authMiddleware, upload.single('file'), (req, res) => {
   });
 });
 
-// Health check
-app.get('/api/ping', (req, res) => res.json({ ok: true, rooms: Object.keys(db.rooms).length, users: Object.keys(db.users).length }));
+app.get('/api/ping', async (req, res) => {
+  const { count } = await supabase.from('users').select('*', { count: 'exact', head: true });
+  res.json({ ok: true, users: count });
+});
 
 // --- Socket.IO ---
 io.use((socket, next) => {
@@ -205,13 +173,16 @@ io.on('connection', (socket) => {
   const { id: userId, username } = socket.user;
   userSockets[userId] = socket.id;
 
-  socket.on('join-room', ({ roomId }) => {
-    const room = db.rooms[roomId];
-    if (!room || !room.members.has(userId)) return;
+  socket.on('join-room', async ({ roomId }) => {
+    const { data: member } = await supabase.from('room_members').select('user_id').eq('room_id', roomId).eq('user_id', userId).maybeSingle();
+    if (!member) return;
 
-    // Quitter les rooms précédentes
     Object.keys(onlineUsers).forEach(sid => {
-      if (onlineUsers[sid]?.userId === userId) delete onlineUsers[sid];
+      if (onlineUsers[sid]?.userId === userId) {
+        const old = onlineUsers[sid];
+        socket.leave(old.roomId);
+        delete onlineUsers[sid];
+      }
     });
 
     onlineUsers[socket.id] = { userId, username, roomId };
@@ -223,30 +194,47 @@ io.on('connection', (socket) => {
     );
   });
 
-  socket.on('send-message', ({ roomId, content, type = 'text', fileUrl, filename, mimetype }) => {
-    const room = db.rooms[roomId];
-    if (!room || !room.members.has(userId)) return;
+  socket.on('send-message', async ({ roomId, content, type = 'text', fileUrl, filename, mimetype }) => {
+    const { data: member } = await supabase.from('room_members').select('user_id').eq('room_id', roomId).eq('user_id', userId).maybeSingle();
+    if (!member) return;
 
-    const msg = { id: uuidv4(), userId, username, content, type, fileUrl, filename, mimetype, timestamp: Date.now() };
-    if (!db.messages[roomId]) db.messages[roomId] = [];
-    db.messages[roomId].push(msg);
-    if (db.messages[roomId].length > 200) db.messages[roomId].shift();
-    saveData();
+    const { data: msg } = await supabase.from('messages').insert({
+      room_id: roomId,
+      user_id: userId,
+      username,
+      content,
+      type,
+      file_url: fileUrl,
+      filename,
+      mimetype
+    }).select('id, created_at').single();
 
-    io.to(roomId).emit('new-message', msg);
+    if (!msg) return;
+
+    io.to(roomId).emit('new-message', {
+      id: msg.id,
+      userId,
+      username,
+      content,
+      type,
+      fileUrl,
+      filename,
+      mimetype,
+      timestamp: new Date(msg.created_at).getTime()
+    });
   });
 
   socket.on('typing', ({ roomId }) => socket.to(roomId).emit('user-typing', { username }));
   socket.on('stop-typing', ({ roomId }) => socket.to(roomId).emit('user-stop-typing', { username }));
 
-  // WebRTC
+  // WebRTC signaling
   socket.on('call-offer', ({ targetUserId, offer, callType }) => {
     const s = userSockets[targetUserId];
     if (s) io.to(s).emit('call-incoming', { fromUserId: userId, fromUsername: username, offer, callType });
   });
   socket.on('call-answer', ({ targetUserId, answer }) => {
     const s = userSockets[targetUserId];
-    if (s) io.to(s).emit('call-answered', { answer, fromUserId: userId });
+    if (s) io.to(s).emit('call-answered', { answer });
   });
   socket.on('call-ice-candidate', ({ targetUserId, candidate }) => {
     const s = userSockets[targetUserId];
